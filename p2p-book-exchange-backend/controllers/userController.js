@@ -5,7 +5,6 @@ const path = require('path');
 const usersFilePath = path.join(__dirname, '../data/users.json');
 let users = JSON.parse(fs.readFileSync(usersFilePath, 'utf-8'));
 
-// Register user function
 exports.registerUser = (req, res) => {
   const { name, email, password, role } = req.body;
   const newUser = { id: Date.now().toString(), name, email, password, role };
@@ -14,7 +13,6 @@ exports.registerUser = (req, res) => {
   res.status(201).json({ message: 'User registered successfully!', user: newUser });
 };
 
-// Login user function (mock authentication)
 exports.loginUser = (req, res) => {
   const { email, password } = req.body;
   const user = users.find(u => u.email === email && u.password === password);

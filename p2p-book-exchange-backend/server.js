@@ -13,6 +13,12 @@ const bookRoutes = require('./routes/books');
 // Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/books', bookRoutes);
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "User route is healthy ✅"
+  });
+});
 
 // Start server
 const PORT = 5000;
