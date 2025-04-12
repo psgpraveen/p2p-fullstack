@@ -7,14 +7,27 @@ import AddBookForm from "../components/AddBookForm";
 import BookCard from "../components/BookCard";
 import Header from "../components/Header";
 import EditDeleteBookForm from "../components/EditDeleteBookForm";
-import { toast } from "react-toastify"; // For error notifications
+import { toast } from "react-toastify";
+import { Book } from "@/app/types/Index";
+
+// Define a type to represent the API response shape for a book
+interface APIBook {
+  _id: string;
+  title: string;
+  author: string;
+  genre?: string;
+  location: string;
+  contact?: string;
+  imageBase64?: string;
+}
 
 export default function DashboardPage() {
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [books, setBooks] = useState<any[]>([]);
-  const [selectedBook, setSelectedBook] = useState<any>(null);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
+  const url = process.env.NEXT_PUBLIC_NEXT_URL;
 
   // Redirect if no userRole is found
   useEffect(() => {
@@ -25,28 +38,47 @@ export default function DashboardPage() {
       setUserRole(role);
     }
   }, [router]);
-const url = process.env.NEXT_PUBLIC_NEXT_URL;
-  // Fetch books from API
+
+  // Fetch books from API and map data to our Book type
   useEffect(() => {
-    
     axios
       .get(`${url}/api/books`)
       .then((response) => {
-        setBooks(response.data);
-        console.log(response.data);
-        
+        // Assert the response data as an array of APIBook
+        const data = response.data as APIBook[];
+        const fetchedBooks: Book[] = data.map((book) => ({
+          _id: book._id,
+          title: book.title,
+          author: book.author,
+          genre: book.genre || "", // Ensure genre is always a string
+          location: book.location,
+          contact: book.contact || "", // Provide default if missing
+          imageBase64: book.imageBase64 ?? null,
+        }));
+        setBooks(fetchedBooks);
+        console.log(fetchedBooks);
       })
       .catch((error) => {
         console.error("Error fetching books:", error);
         toast.error("Failed to load books. Please try again later.");
       });
-  }, []);
+  }, [url]);
 
   const refreshBooks = () => {
     axios
       .get(`${url}/api/books`)
       .then((response) => {
-        setBooks(response.data);
+        const data = response.data as APIBook[];
+        const fetchedBooks: Book[] = data.map((book) => ({
+          _id: book._id,
+          title: book.title,
+          author: book.author,
+          genre: book.genre || "",
+          location: book.location,
+          contact: book.contact || "",
+          imageBase64: book.imageBase64 ?? null,
+        }));
+        setBooks(fetchedBooks);
       })
       .catch((error) => {
         console.error("Error fetching books:", error);
@@ -86,9 +118,9 @@ function OwnerDashboard({
   setIsModalOpen,
   refreshBooks,
 }: {
-  books: any[];
-  selectedBook: any;
-  setSelectedBook: (book: any) => void;
+  books: Book[];
+  selectedBook: Book | null;
+  setSelectedBook: (book: Book) => void;
   isModalOpen: boolean;
   setIsModalOpen: (state: boolean) => void;
   refreshBooks: () => void;
@@ -109,7 +141,7 @@ function OwnerDashboard({
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {books.map((book) => (
-              <div key={book.id} className="relative group">
+              <div key={book._id} className="relative group">
                 <BookCard book={book} />
                 <button
                   onClick={() => {
@@ -153,13 +185,13 @@ function OwnerDashboard({
   );
 }
 
-function SeekerDashboard({ books }: { books: any[] }) {
+function SeekerDashboard({ books }: { books: Book[] }) {
   const [filters, setFilters] = useState({ genre: "", location: "" });
 
   const filteredBooks = books.filter((book) => {
     return (
-      (!filters.genre || book.genre?.toLowerCase().includes(filters.genre.toLowerCase())) &&
-      (!filters.location || book.location?.toLowerCase().includes(filters.location.toLowerCase()))
+      (!filters.genre || book.genre.toLowerCase().includes(filters.genre.toLowerCase())) &&
+      (!filters.location || book.location.toLowerCase().includes(filters.location.toLowerCase()))
     );
   });
 
@@ -186,7 +218,7 @@ function SeekerDashboard({ books }: { books: any[] }) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredBooks.map((book) => (
-            <BookCard key={book.id} book={book} />
+            <BookCard key={book._id} book={book} />
           ))}
         </div>
       )}

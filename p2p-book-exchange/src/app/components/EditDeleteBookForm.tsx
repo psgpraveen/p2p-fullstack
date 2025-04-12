@@ -3,12 +3,23 @@
 import { useState } from "react";
 import axios from "axios";
 
+// Define the Book interface
+interface Book {
+  _id: string;
+  title: string;
+  author: string;
+  genre: string;
+  location: string;
+  contact: string;
+  imageBase64: string | null | undefined;
+}
+
 export default function EditDeleteBookForm({
   book,
   onUpdate,
   onDelete,
 }: {
-  book: any;
+  book: Book; // Use the Book interface here
   onUpdate: () => void;
   onDelete: () => void;
 }) {

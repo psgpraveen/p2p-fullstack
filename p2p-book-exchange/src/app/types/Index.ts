@@ -7,12 +7,12 @@ export type User = {
   };
   
   export type Book = {
-    id: string;
+    _id: string;
     title: string;
     author: string;
-    genre?: string;
+    genre: string;             
     location: string;
     contact: string;
-    imagePath?: string; 
+    imageBase64: string | null;
   };
   
