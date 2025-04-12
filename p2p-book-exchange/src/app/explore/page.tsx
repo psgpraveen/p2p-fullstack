@@ -5,17 +5,33 @@ import axios from "axios";
 import Header from "../components/Header";
 import BookCard from "../components/BookCard";
 
+// Define a strict Book interface
+interface Book {
+  _id: string;
+  title: string;
+  author: string;
+  genre: string;
+  location: string;
+  imageBase64: string | null;
+}
+
+// Filter state type
+interface Filter {
+  genre: string;
+  location: string;
+}
+
 export default function ExplorePage() {
-  const [books, setBooks] = useState<any[]>([]);
-  const [filteredBooks, setFilteredBooks] = useState<any[]>([]);
-  const [filters, setFilters] = useState({ genre: "", location: "" });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [books, setBooks] = useState<Book[]>([]);
+  const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
+  const [filters, setFilters] = useState<Filter>({ genre: "", location: "" });
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
   const url = process.env.NEXT_PUBLIC_NEXT_URL;
 
   useEffect(() => {
     axios
-      .get(`${url}/api/books`)
+      .get<Book[]>(`${url}/api/books`)
       .then((response) => {
         setBooks(response.data);
         setFilteredBooks(response.data);
@@ -37,7 +53,9 @@ export default function ExplorePage() {
       const locationMatch =
         !filters.location ||
         (book.location &&
-          book.location.toLowerCase().includes(filters.location.toLowerCase()));
+          book.location
+            .toLowerCase()
+            .includes(filters.location.toLowerCase()));
       return genreMatch && locationMatch;
     });
     setFilteredBooks(newFilteredBooks);
@@ -70,7 +88,6 @@ export default function ExplorePage() {
           />
         </div>
 
-        {/* Books Display Section */}
         {loading ? (
           <p className="text-center text-gray-500">Loading books...</p>
         ) : error ? (
