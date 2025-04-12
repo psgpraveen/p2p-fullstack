@@ -13,5 +13,6 @@ export type User = {
     genre?: string;
     location: string;
     contact: string;
+    imagePath?: string; 
   };
   

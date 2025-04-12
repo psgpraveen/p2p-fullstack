@@ -44,6 +44,8 @@ export default function LoginPage() {
       setTimeout(() => router.push("/dashboard"), 1000);
     } catch (error) {
       toast.error("Invalid email or password.");
+      console.log(error);
+      
     } finally {
       setLoading(false);
     }

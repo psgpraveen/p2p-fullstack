@@ -19,7 +19,9 @@ export default function EditDeleteBookForm({
     location: book.location || "",
     contact: book.contact || "",
   });
-const url = process.env.NEXT_PUBLIC_NEXT_URL;
+
+  const url = process.env.NEXT_PUBLIC_NEXT_URL;
+
   const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -34,7 +36,7 @@ const url = process.env.NEXT_PUBLIC_NEXT_URL;
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`http://localhost:5000/api/books/${book.id}`);
+      await axios.delete(`${url}/api/books/${book.id}`);
       alert("Book deleted successfully!");
       onDelete(); 
     } catch (error) {

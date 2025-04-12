@@ -30,22 +30,21 @@ export default function AddBookForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       const formDataWithImage = new FormData();
-      Object.keys(formData).forEach((key) => {
-        const typedKey = key as keyof FormDataType;
-        if (typedKey === "image" && formData.image) {
-          formDataWithImage.append(typedKey, formData.image);
-        } else {
-          formDataWithImage.append(typedKey, formData[typedKey]);
+      
+      // Ensure that key is typed properly for each field
+      (Object.keys(formData) as (keyof FormDataType)[]).forEach((key) => {
+        if (key === "image" && formData.image) {
+          formDataWithImage.append(key, formData.image); // Append the image only if it exists
+        } else if (key !== "image" && formData[key as keyof FormDataType] !== null) {
+          formDataWithImage.append(key, formData[key as keyof FormDataType] as string); // Cast non-image fields to string if not null
         }
       });
-
+  
       const response = await axios.post(`${url}/api/books/add`, formDataWithImage, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      
       alert("Book added successfully!");
       console.log(response.data);
     } catch (error) {
@@ -53,6 +52,7 @@ export default function AddBookForm() {
       alert("Failed to add book.");
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 p-4 border rounded-lg shadow-md">
@@ -102,10 +102,7 @@ export default function AddBookForm() {
         onChange={handleFileChange}
         className="w-full p-2 border rounded"
       />
-      <button
-        type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-      >
+      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
         Add Book
       </button>
     </form>

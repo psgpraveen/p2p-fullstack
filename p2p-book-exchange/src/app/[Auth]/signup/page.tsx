@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Header from "../../components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Link from "next/link";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -23,7 +24,7 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_NEXT_URL}/api/users/register`, formData);
+      await axios.post(`${process.env.NEXT_PUBLIC_NEXT_URL}/api/users/register`, formData);
       localStorage.setItem("userRole", formData.role);
       toast.success("Signup successful! Redirecting...");
       setTimeout(() => router.push("/dashboard"), 1500);
@@ -136,9 +137,9 @@ export default function SignupPage() {
 
           <p className="mt-6 text-center text-sm text-white">
             Already have an account?{" "}
-            <a href="/auth/login" className="text-white underline font-semibold hover:text-blue-200">
+            <Link href="/auth/login" className="text-white underline font-semibold hover:text-blue-200">
               Login
-            </a>
+            </Link>
           </p>
         </div>
       </div>

@@ -7,14 +7,16 @@ import AddBookForm from "../components/AddBookForm";
 import BookCard from "../components/BookCard";
 import Header from "../components/Header";
 import EditDeleteBookForm from "../components/EditDeleteBookForm";
+import { toast } from "react-toastify"; // For error notifications
 
 export default function DashboardPage() {
   const [userRole, setUserRole] = useState<string | null>(null);
-  const [books, setBooks] = useState([]);
-  const [selectedBook, setSelectedBook] = useState(null);
+  const [books, setBooks] = useState<any[]>([]);
+  const [selectedBook, setSelectedBook] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
+  // Redirect if no userRole is found
   useEffect(() => {
     const role = localStorage.getItem("userRole");
     if (!role) {
@@ -23,17 +25,31 @@ export default function DashboardPage() {
       setUserRole(role);
     }
   }, [router]);
-
+const url = process.env.NEXT_PUBLIC_NEXT_URL;
+  // Fetch books from API
   useEffect(() => {
-    axios.get("http://localhost:5000/api/books").then((response) => {
-      setBooks(response.data);
-    });
+    
+    axios
+      .get(`${url}/api/books`)
+      .then((response) => {
+        setBooks(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching books:", error);
+        toast.error("Failed to load books. Please try again later.");
+      });
   }, []);
 
   const refreshBooks = () => {
-    axios.get("http://localhost:5000/api/books").then((response) => {
-      setBooks(response.data);
-    });
+    axios
+      .get(`${url}/api/books`)
+      .then((response) => {
+        setBooks(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching books:", error);
+        toast.error("Failed to load books. Please try again later.");
+      });
   };
 
   return (
