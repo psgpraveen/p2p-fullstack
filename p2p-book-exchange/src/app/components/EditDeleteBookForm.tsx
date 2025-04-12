@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-hot-toast"; // Import the toast module
 
 // Define the Book interface
 interface Book {
@@ -37,22 +38,22 @@ export default function EditDeleteBookForm({
     e.preventDefault();
     try {
       await axios.put(`${url}/api/books/${book._id}`, formData);
-      alert("Book updated successfully!");
-      onUpdate(); 
+      toast.success("Book updated successfully!"); // Success toast
+      onUpdate();
     } catch (error) {
       console.error(error);
-      alert("Failed to update book.");
+      toast.error("Failed to update book."); // Error toast
     }
   };
 
   const handleDelete = async () => {
     try {
       await axios.delete(`${url}/api/books/${book._id}`);
-      alert("Book deleted successfully!");
-      onDelete(); 
+      toast.success("Book deleted successfully!"); // Success toast
+      onDelete();
     } catch (error) {
       console.error(error);
-      alert("Failed to delete book.");
+      toast.error("Failed to delete book."); // Error toast
     }
   };
 
