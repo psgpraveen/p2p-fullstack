@@ -5,10 +5,9 @@ const cors = require('cors');
 const connectDB = require('./utils/db'); 
 const app = express();
 const PORT = process.env.PORT || 4000;
-
 const allowedOrigins = [
-  'https://p2p-fullstack.vercel.app',
-  'http://localhost:5000'
+  'https://p2p-fullstack.vercel.app', // Frontend on Vercel
+  'http://localhost:3000'             // Dev mode
 ];
 
 app.use(cors({
@@ -16,7 +15,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS: ' + origin));
+      callback(new Error('CORS not allowed for this origin: ' + origin));
     }
   },
   credentials: true,
@@ -25,10 +24,11 @@ app.use(cors({
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "https://p2p-fullstack.vercel.app");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header("Access-Control-Allow-Credentials", "true");
   next();
 });
+
 
 // Middleware
 app.use(bodyParser.json({ limit: '10mb' }));
