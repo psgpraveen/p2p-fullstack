@@ -24,13 +24,19 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_NEXT_URL}/api/users/register`, formData);
+    const res =  await axios.post(`${process.env.NEXT_PUBLIC_NEXT_URL}/api/users/register`, formData);
+    console.log(res);
       localStorage.setItem("userRole", formData.role);
       toast.success("Signup successful! Redirecting...");
+      
       setTimeout(() => router.push("/dashboard"), 1500);
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      toast.error("Signup failed. Please try again.");
+      if (error.response && error.response.status === 400) {
+        toast.error(error.response.data.message || "Signup failed. Please try again.");
+      } else {
+        toast.error("Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
