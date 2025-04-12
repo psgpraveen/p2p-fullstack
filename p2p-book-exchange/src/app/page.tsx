@@ -1,5 +1,7 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
   return (
@@ -15,18 +17,18 @@ export default function Home() {
             Discover, exchange, and share your favorite books with fellow book lovers.
           </p>
           <div className="flex justify-center gap-4">
-            <a
+            <Link
               href="/auth/login"
               className="bg-blue-600 text-white font-semibold px-6 py-3 rounded hover:bg-blue-700 transition"
             >
               Login
-            </a>
-            <a
+            </Link>
+            <Link
               href="/auth/signup"
               className="bg-green-600 text-white font-semibold px-6 py-3 rounded hover:bg-green-700 transition"
             >
               Sign Up
-            </a>
+            </Link>
           </div>
         </section>
 
@@ -45,9 +47,11 @@ export default function Home() {
             </ul>
           </div>
           <div className="flex items-center justify-center">
-            <img
+            <Image
               src="/image.png"
               alt="Bookshelf Illustration"
+              width={400}
+              height={300}
               className="w-full max-w-md rounded shadow-md"
             />
           </div>
@@ -56,17 +60,17 @@ export default function Home() {
         <section className="mt-12 bg-blue-50 p-8 rounded-lg text-center shadow-lg">
           <h2 className="text-3xl font-bold mb-4">Get Started Today!</h2>
           <p className="text-gray-700 mb-6">
-            Join our community and find your next great read. It's easy, fast, and fun!
+            Join our community and find your next great read. {"It's easy, fast, and fun!"}
           </p>
-          <a
+          <Link
             href="/explore"
             className="bg-blue-600 text-white font-semibold px-6 py-3 rounded hover:bg-blue-700 transition"
           >
             Explore Books
-          </a>
+          </Link>
         </section>
       </main>
-      <Footer/>
+      <Footer />
     </>
   );
 }
