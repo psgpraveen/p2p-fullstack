@@ -24,7 +24,7 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_NEXT_URL}/api/users/register`, formData);
+      await axios.post(`${process.env.NEXT_PUBLIC_NEXT_URL}api/users/register`, formData);
       localStorage.setItem("userRole", formData.role);
       toast.success("Signup successful! Redirecting...");
       setTimeout(() => router.push("/dashboard"), 1500);
