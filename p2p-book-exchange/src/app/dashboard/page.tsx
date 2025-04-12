@@ -33,6 +33,8 @@ const url = process.env.NEXT_PUBLIC_NEXT_URL;
       .get(`${url}/api/books`)
       .then((response) => {
         setBooks(response.data);
+        console.log(response.data);
+        
       })
       .catch((error) => {
         console.error("Error fetching books:", error);

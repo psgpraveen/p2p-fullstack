@@ -30,21 +30,42 @@ export default function AddBookForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+  
     try {
-      const formDataWithImage = new FormData();
-      
-      // Ensure that key is typed properly for each field
-      (Object.keys(formData) as (keyof FormDataType)[]).forEach((key) => {
-        if (key === "image" && formData.image) {
-          formDataWithImage.append(key, formData.image); // Append the image only if it exists
-        } else if (key !== "image" && formData[key as keyof FormDataType] !== null) {
-          formDataWithImage.append(key, formData[key as keyof FormDataType] as string); // Cast non-image fields to string if not null
-        }
+      let base64Image = "";
+  
+      if (formData.image) {
+        const reader = new FileReader();
+  
+        const imageToBase64 = () =>
+          new Promise<string>((resolve, reject) => {
+            reader.onloadend = () => {
+              if (typeof reader.result === "string") {
+                resolve(reader.result); // full data:image/... string
+              } else {
+                reject("Image conversion failed");
+              }
+            };
+            reader.readAsDataURL(formData.image as Blob);
+          });
+  
+        base64Image = await imageToBase64();
+      }
+  
+      const payload = {
+        title: formData.title,
+        author: formData.author,
+        genre: formData.genre,
+        location: formData.location,
+        contact: formData.contact,
+        ownerId: "60b8c8d8b5b2b5d9b9c9b9b9", // hardcoded or from auth/session
+        image: base64Image, // pass base64 here
+      };
+  
+      const response = await axios.post(`${url}/api/books/add`, payload, {
+        headers: { "Content-Type": "application/json" },
       });
   
-      const response = await axios.post(`${url}/api/books/add`, formDataWithImage, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
       alert("Book added successfully!");
       console.log(response.data);
     } catch (error) {
@@ -52,6 +73,7 @@ export default function AddBookForm() {
       alert("Failed to add book.");
     }
   };
+  
   
 
   return (

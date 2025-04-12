@@ -1,96 +1,58 @@
-const fs = require('fs');
-const path = require('path');
-const multer = require('multer');
+const Book = require('../models/Book');
 
-const booksFilePath = path.join(__dirname, '../data/books.json');
-let books = JSON.parse(fs.readFileSync(booksFilePath, 'utf-8'));
-
-const uploadFolder = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadFolder)) {
-  fs.mkdirSync(uploadFolder);
-}
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadFolder),
-  filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
-});
-const upload = multer({ storage });
-
-
-exports.addBook = [
-  upload.single('image'),
-  (req, res) => {
-    const { title, author, genre, location, contact } = req.body;
-    const newBook = {
-      id: Date.now().toString(),
+exports.addBook = async (req, res) => {
+  try {
+    const {
       title,
       author,
       genre,
       location,
       contact,
-      imagePath: req.file ? `/uploads/${req.file.filename}` : null, 
-    };
-    books.push(newBook);
-    fs.writeFileSync(booksFilePath, JSON.stringify(books));
+      ownerId,
+      image, // base64 string from client
+    } = req.body;
+
+    const base64Data = image?.includes(',') ? image.split(',')[1] : image;
+
+    const newBook = await Book.create({
+      title,
+      author,
+      genre,
+      location,
+      contact,
+      ownerId,
+      imageBase64: base64Data,
+    });
+
     res.status(201).json({ message: 'Book added successfully!', book: newBook });
-  },
-];
-
-
-exports.getBooks = (req, res) => {
-  const { genre, location } = req.query;
-  let filteredBooks = books;
-
-  if (genre) {
-    filteredBooks = filteredBooks.filter((book) =>
-      book.genre?.toLowerCase().includes(genre.toLowerCase())
-    );
-  }
-
-  if (location) {
-    filteredBooks = filteredBooks.filter((book) =>
-      book.location?.toLowerCase().includes(location.toLowerCase())
-    );
-  }
-
-  res.status(200).json(filteredBooks);
-};
-
-exports.editBook = (req, res) => {
-  const { id } = req.params;
-  const { title, author, genre, location, contact } = req.body;
-  const bookIndex = books.findIndex((book) => book.id === id);
-
-  if (bookIndex !== -1) {
-    books[bookIndex] = { ...books[bookIndex], title, author, genre, location, contact };
-    fs.writeFileSync(booksFilePath, JSON.stringify(books));
-    res.status(200).json({ message: 'Book updated successfully!', book: books[bookIndex] });
-  } else {
-    res.status(404).json({ message: 'Book not found!' });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };
 
-exports.deleteBook = (req, res) => {
-  const { id } = req.params;
-  const bookIndex = books.findIndex((book) => book.id === id);
+exports.getBooks = async (req, res) => {
+  try {
+    const books = await Book.find().populate('ownerId', 'name email');
+    res.status(200).json(books);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
-  if (bookIndex !== -1) {
-    books.splice(bookIndex, 1);
-    fs.writeFileSync(booksFilePath, JSON.stringify(books));
+exports.editBook = async (req, res) => {
+  try {
+    const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.status(200).json({ message: 'Book updated successfully!', book: updatedBook });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+exports.deleteBook = async (req, res) => {
+  try {
+    await Book.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: 'Book deleted successfully!' });
-  } else {
-    res.status(404).json({ message: 'Book not found!' });
-  }
-};
-
-exports.markBookAsRented = (req, res) => {
-  const { id } = req.params;
-  const bookIndex = books.findIndex((book) => book.id === id);
-
-  if (bookIndex !== -1) {
-    books[bookIndex].status = 'rented';
-    fs.writeFileSync(booksFilePath, JSON.stringify(books));
-    res.status(200).json({ message: 'Book marked as rented!', book: books[bookIndex] });
-  } else {
-    res.status(404).json({ message: 'Book not found!' });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
 };

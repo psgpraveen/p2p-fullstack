@@ -1,31 +1,24 @@
-import { Book } from "@/app/types/Index";
-
 interface BookCardProps {
-  book: Book;
+  book: any;
 }
 
-export default function BookCard({ book }: BookCardProps) {
-  const url = process.env.NEXT_PUBLIC_NEXT_URL;
+const BookCard: React.FC<BookCardProps> = ({ book }) => {
 
-  if (!url) {
-    console.error("NEXT_PUBLIC_NEXT_URL is not defined.");
-    return null;
-  }
+  const imageSource = book.imageBase64
+  ? `data:image/jpeg;base64,${book.imageBase64}`
+  : "/path/to/default-image.jpg";  
 
   return (
-    <div className="p-4 border rounded-lg shadow-sm hover:shadow-md transition-shadow bg-white">
-      {book.imagePath && (
-        <img
-          src={`${url}/${book.imagePath}`} 
-          alt={book.title}
-          className="w-full h-40 object-cover rounded-lg mb-4"
-        />
-      )}
-      <h2 className="text-xl font-semibold">{book.title}</h2>
-      <p className="text-gray-600">By {book.author}</p>
-      <p className="text-gray-600">Genre: {book.genre || "N/A"}</p>
-      <p className="text-gray-600">Location: {book.location}</p>
-      <p className="text-gray-600">Contact: {book.contact}</p>
+    <div className="bg-white rounded-lg shadow-md p-4">
+      <img
+        src={imageSource}
+        alt={book.title}
+        className="w-full h-40 object-cover rounded-md mb-4"
+      />
+      <h3 className="text-xl font-semibold">{book.title}</h3>
+      <p className="text-gray-600">{book.author}</p>
     </div>
   );
-}
+};
+
+export default BookCard;

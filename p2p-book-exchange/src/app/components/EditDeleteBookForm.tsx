@@ -25,7 +25,7 @@ export default function EditDeleteBookForm({
   const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.put(`${url}/api/books/${book.id}`, formData);
+      await axios.put(`${url}/api/books/${book._id}`, formData);
       alert("Book updated successfully!");
       onUpdate(); 
     } catch (error) {
@@ -36,7 +36,7 @@ export default function EditDeleteBookForm({
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${url}/api/books/${book.id}`);
+      await axios.delete(`${url}/api/books/${book._id}`);
       alert("Book deleted successfully!");
       onDelete(); 
     } catch (error) {
@@ -48,6 +48,18 @@ export default function EditDeleteBookForm({
   return (
     <form onSubmit={handleEdit} className="space-y-4 p-4 border rounded-lg shadow-md bg-white">
       <h2 className="text-xl font-bold">Edit Book</h2>
+
+      {/* Show existing image if available */}
+      {book.imageBase64 && (
+        <div className="flex justify-center">
+          <img
+            src={`data:image/jpeg;base64,${book.imageBase64}`}
+            alt="Current Book"
+            className="w-32 h-32 object-cover rounded shadow"
+          />
+        </div>
+      )}
+
       <input
         type="text"
         placeholder="Title"
@@ -87,8 +99,12 @@ export default function EditDeleteBookForm({
         required
         className="w-full p-2 border rounded"
       />
+
       <div className="flex space-x-4">
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
           Update Book
         </button>
         <button
