@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";  // Import AxiosError
 import { useRouter } from "next/navigation";
 import Header from "../../components/Header";
 import { ToastContainer, toast } from "react-toastify";
@@ -24,16 +24,22 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     try {
-    const res =  await axios.post(`${process.env.NEXT_PUBLIC_NEXT_URL}/api/users/register`, formData);
-    console.log(res);
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_NEXT_URL}/api/users/register`,
+        formData
+      );
+      console.log(res);
       localStorage.setItem("userRole", formData.role);
       toast.success("Signup successful! Redirecting...");
-      
+
       setTimeout(() => router.push("/dashboard"), 1500);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      if (error.response && error.response.status === 400) {
-        toast.error(error.response.data.message || "Signup failed. Please try again.");
+      if (error instanceof AxiosError && error.response) {
+        // Handle AxiosError properly
+        if (error.response.status === 400) {
+          toast.error(error.response.data.message || "Signup failed. Please try again.");
+        }
       } else {
         toast.error("Something went wrong. Please try again.");
       }
@@ -107,7 +113,7 @@ export default function SignupPage() {
               <select
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                className="mt-1 w-full  cursor-pointerpx-4 py-2 rounded-lg bg-white text-black border border-gray-300 focus:ring-2 focus:ring-blue-400"
+                className="mt-1 w-full cursor-pointer px-4 py-2 rounded-lg bg-white text-black border border-gray-300 focus:ring-2 focus:ring-blue-400"
               >
                 <option value="owner">Book Owner</option>
                 <option value="seeker">Book Seeker</option>
