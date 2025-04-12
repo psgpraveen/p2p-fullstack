@@ -6,16 +6,33 @@ const connectDB = require('./utils/db');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json({ limit: '10mb' })); // You can change '10mb' to any size you prefer
+const allowedOrigins = [
+  'https://p2p-fullstack.vercel.app',
+  'http://localhost:5000'
+];
 
-app.get('/', (req, res) => {
-  res.status(200).json({
-    status: "ok",
-    message: "Server is running ✅"
-  });
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS: ' + origin));
+    }
+  },
+  credentials: true,
+}));
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://p2p-fullstack.vercel.app");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Credentials", "true");
+  next();
 });
+
+// Middleware
+app.use(bodyParser.json({ limit: '10mb' }));
+
 // Routes
 const userRoutes = require('./routes/user');
 const bookRoutes = require('./routes/books');
@@ -23,13 +40,15 @@ const bookRoutes = require('./routes/books');
 app.use('/api/users', userRoutes);
 app.use('/api/books', bookRoutes);
 
-
+// Root
+app.get('/', (req, res) => {
+  res.status(200).json({ status: "ok", message: "Server is running ✅" });
+});
 
 // Start server
-
 app.listen(PORT, async () => {
   try {
-    await connectDB(); // ⬅️ Ensure DB connection before starting
+    await connectDB();
     console.log(`✅ Server running at http://localhost:${PORT}`);
   } catch (err) {
     console.error('❌ Failed to connect to DB', err);
